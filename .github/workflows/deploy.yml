@@ -20,4 +20,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Build & Test
-          run: mvn clean verify sonar:sonar -Dsonar.token=${{ 3ff5e3629f64ae688c8908b7d0a5e03385de941e }}
+        run: mvn clean verify sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
