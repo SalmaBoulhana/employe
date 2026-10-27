@@ -1,42 +1,32 @@
 name: Java CI with Maven
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # 1. Récupération du code source depuis GitHub
-      - name: Vérification du code source
+      # 1. Récupérer le code depuis GitHub
+      - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      # 2. Configuration de Java 17 (Pour votre application et vos tests)
+
+      # 2. Configurer Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'maven'
-      # 3. Configuration de Java 21 (Requis par SonarQube)
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-        java-version: '21'
-        distribution: 'temurin'
-      # Étape de Build & Test mise à jour
-      # 3. Compilation, exécution des tests connectés à RDS et analyse SonarQube
-      - name: Build, Test & Sonar Analysis
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # 3. Compiler le projet et exécuter les tests
+      - name: Build and Test
         env:
-          # Injection des secrets de votre base de données RDS
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          # Jeton pour l'analyse de code Sonar
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn clean verify \
-          -Dspring.datasource.url="${{ secrets.DB_URL }}" \
-          -Dspring.datasource.username="${{ secrets.DB_USERNAME }}" \
-          -Dspring.datasource.password="${{ secrets.DB_PASSWORD }}"
+          SPRING_PROFILES_ACTIVE: prod
+        run: mvn -B clean verify
